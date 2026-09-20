@@ -261,32 +261,35 @@ const $=s=>document.querySelector(s);
 const money=n=>n>0?n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}):"Consultar";
 function save(){localStorage.setItem("nexvy_cart",JSON.stringify(cart))}
 function toast(msg){const e=$("#toast");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2200)}
+function normalizeText(value){
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase()
+    .trim();
+}
+
 function renderProducts(){
   let list=[...products];
-  const q=$("#search").value.toLowerCase().trim();
+  const rawQuery=$("#search")?.value || "";
+  const q=normalizeText(rawQuery);
   const cat=$("#category").value;
   const sort=$("#sort").value;
-
-  // Destaques exibidos na página inicial, seguindo a referência visual.
   const featuredIds=[13,9,1,3,18,21,25,28];
 
-  // Quando uma categoria é selecionada, somente os produtos daquela categoria aparecem.
-  // Sem categoria selecionada, a home mostra apenas os produtos em destaque.
   if(currentGroup && currentGroup!=="all"){
     list=list.filter(p=>p.group===currentGroup);
   }else if(cat!=="all"){
     list=list.filter(p=>p.group===cat);
-  }else if(!q){
-    list=list.filter(p=>featuredIds.includes(p.id));
   }
 
-  // Busca pesquisa o catálogo inteiro, mas respeita a categoria se uma estiver selecionada.
   if(q){
-    list=[...products].filter(p=>
-      (p.name+" "+p.group+" "+p.subgroup+" "+p.desc).toLowerCase().includes(q)
-    );
-    if(currentGroup && currentGroup!=="all") list=list.filter(p=>p.group===currentGroup);
-    else if(cat!=="all") list=list.filter(p=>p.group===cat);
+    list=list.filter(p=>{
+      const searchable=normalizeText(`${p.name} ${p.group} ${p.subgroup} ${p.desc}`);
+      return searchable.includes(q);
+    });
+  }else if(!currentGroup && cat==="all"){
+    list=list.filter(p=>featuredIds.includes(p.id));
   }
 
   if(sort==="low") list.sort((a,b)=>(a.unitPrice||a.price)-(b.unitPrice||b.price));
@@ -295,7 +298,8 @@ function renderProducts(){
 
   const title=$("#productsTitle");
   if(title){
-    title.textContent=currentGroup ? currentGroup : (cat!=="all" ? cat : (q ? "Resultados da pesquisa" : "Produtos em Destaque"));
+    title.textContent=q ? `Resultados para "${rawQuery}"` :
+      (currentGroup ? currentGroup : (cat!=="all" ? cat : "Produtos em Destaque"));
   }
 
   $("#products").innerHTML=list.length
@@ -312,8 +316,9 @@ function renderProducts(){
           </div>
         </div>
       </article>`).join("")
-    : `<div class="empty">${currentGroup==="Other" ? "Nenhum produto em Outros no momento." : "Nenhum produto encontrado."}</div>`;
+    : `<div class="empty">Nenhum produto encontrado para "${rawQuery}".</div>`;
 }
+
 function renderCart(){
  $("#cartCount").textContent=cart.reduce((s,i)=>s+i.qty,0);
  if(!cart.length){$("#cartItems").innerHTML='<div class="empty">Seu carrinho está vazio.</div>';$("#cartTotal").textContent="Consultar";return}
@@ -338,8 +343,34 @@ $("#cartOverlay").onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.clas
 $("#closeProduct").onclick=()=>$("#productOverlay").classList.remove("open");$("#productOverlay").onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove("open")};
 $("#quantityInput").addEventListener("input",updateQuantityPrice);$("#quantityMinus").onclick=()=>{$("#quantityInput").value=Math.max(currentProduct?.minQty||1,parseInt($("#quantityInput").value||1,10)-1);updateQuantityPrice()};$("#quantityPlus").onclick=()=>{$("#quantityInput").value=Math.max(currentProduct?.minQty||1,parseInt($("#quantityInput").value||1,10)+1);updateQuantityPrice()};
 $("#openSearch").onclick=()=>{$("#searchOverlay").classList.add("open");$("#searchModal").focus()};$("#closeSearch").onclick=()=>$("#searchOverlay").classList.remove("open");$("#searchOverlay").onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove("open")};
-$("#searchModal").addEventListener("input",e=>{$("#search").value=e.target.value;renderProducts()});
-["search","category","sort"].forEach(id=>$("#"+id).addEventListener("input",renderProducts));
+$("#search").addEventListener("input",e=>{
+  const value=e.target.value;
+  $("#searchModal").value=value;
+  renderProducts();
+});
+
+$("#search").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){
+    e.preventDefault();
+    $("#produtos").scrollIntoView({behavior:"smooth"});
+  }
+});
+
+$("#searchModal").addEventListener("input",e=>{
+  $("#search").value=e.target.value;
+  renderProducts();
+});
+
+$("#searchModal").addEventListener("keydown",e=>{
+  if(e.key==="Enter"){
+    e.preventDefault();
+    $("#searchOverlay").classList.remove("open");
+    $("#produtos").scrollIntoView({behavior:"smooth"});
+  }
+});
+
+["category","sort"].forEach(id=>$("#"+id).addEventListener("change",renderProducts));
+
 document.querySelectorAll(".cat").forEach(b=>b.addEventListener("click",()=>{
   document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
   b.classList.add("active");
@@ -348,7 +379,7 @@ document.querySelectorAll(".cat").forEach(b=>b.addEventListener("click",()=>{
   currentGroup=(g==="all" || g==="Other") ? null : g;
   currentSubgroup=null;
   $("#category").value=(g==="all" || g==="Other") ? "all" : g;
-  $("#search").value="";
+  $("#search").value="";$("#searchModal").value="";
   renderProducts();
   $("#produtos").scrollIntoView({behavior:"smooth"});
 }));
