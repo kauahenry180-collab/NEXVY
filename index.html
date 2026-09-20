@@ -94,6 +94,16 @@
     .modal p{color:var(--muted);font-size:14px}.modal-price{font-size:25px;font-weight:900;margin:18px 0}
     .toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#191421;border:1px solid #3b2b50;padding:12px 16px;border-radius:12px;z-index:200;transition:.25s;font-size:13px}
     .toast.show{opacity:1;transform:translate(-50%,0)}
+    .subcategories{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+    .subcat{padding:20px;border:1px solid var(--border);border-radius:18px;background:var(--panel);color:#fff;text-align:left;transition:.2s}
+    .subcat:hover{transform:translateY(-3px);border-color:#49366a}
+    .subcat-icon{font-size:26px;margin-bottom:10px}.subcat h3{font-size:16px}.subcat p{font-size:13px;color:var(--muted);margin-top:4px}
+    .back-category{margin-bottom:18px;background:transparent;border:1px solid var(--border);color:#fff;border-radius:12px;padding:10px 14px}
+    .quantity-box{margin:18px 0;padding:15px;border:1px solid var(--border);border-radius:15px;background:#0d0a14}
+    .quantity-box label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+    .quantity-controls{display:flex;align-items:center;gap:8px}.quantity-controls button{width:40px;height:40px;border:1px solid var(--border);background:var(--panel2);color:#fff;border-radius:10px}
+    .quantity-controls input{flex:1;min-width:0;height:40px;border:1px solid var(--border);background:var(--panel);color:#fff;border-radius:10px;text-align:center;outline:none}
+    .quantity-total{margin-top:10px;font-size:14px;color:var(--muted)}.quantity-total strong{color:#fff;font-size:18px}
     @media(max-width:950px){.products{grid-template-columns:repeat(3,1fr)}.categories{grid-template-columns:repeat(2,1fr)}.hero-grid{grid-template-columns:1fr}.hero-card{display:none}}
     @media(max-width:700px){.navlinks{display:none}.products{grid-template-columns:repeat(2,1fr)}.faq{grid-template-columns:1fr}.section-head{display:block}.section-head p{margin-top:5px}}
     @media(max-width:480px){.products{grid-template-columns:1fr}.categories{grid-template-columns:1fr}.hero{padding-top:55px}h1{font-size:52px}.nav{gap:10px}.brand{margin-right:auto}}
@@ -136,21 +146,25 @@
     <section id="categorias">
       <div class="container">
         <div class="section-head"><div><h2>Categorias</h2><p>Escolha uma categoria para encontrar o que procura.</p></div></div>
-        <div class="categories">
-          <button class="cat" data-category="Discord"><div class="cat-icon">💬</div><h3>Discord</h3><p>Nitro, boosts e membros</p></button>
-          <button class="cat" data-category="Streaming"><div class="cat-icon">▶️</div><h3>Streaming</h3><p>Entretenimento e assinaturas</p></button>
-          <button class="cat" data-category="Games"><div class="cat-icon">🎮</div><h3>Games</h3><p>Keys e moedas digitais</p></button>
-          <button class="cat" data-category="Social"><div class="cat-icon">📈</div><h3>Social</h3><p>Serviços para redes sociais</p></button>
+        <div class="categories" id="categories">
+          <button class="cat" data-group="Discord"><div class="cat-icon">💬</div><h3>Discord</h3><p>Nitro, boosts e membros</p></button>
+          <button class="cat" data-group="Spotify"><div class="cat-icon">🎵</div><h3>Spotify</h3><p>Planos de 1, 3 meses e eterno</p></button>
+          <button class="cat" data-group="Streaming"><div class="cat-icon">▶️</div><h3>Streaming</h3><p>Entretenimento e assinaturas</p></button>
+          <button class="cat" data-group="Games"><div class="cat-icon">🎮</div><h3>Games</h3><p>Keys e moedas digitais</p></button>
+          <button class="cat" data-group="Social"><div class="cat-icon">📈</div><h3>Redes sociais</h3><p>Instagram, TikTok e YouTube</p></button>
+          <button class="cat" data-group="Design"><div class="cat-icon">🎨</div><h3>Design</h3><p>Canva e CapCut</p></button>
+          <button class="cat" data-group="Produtividade"><div class="cat-icon">🤖</div><h3>Produtividade</h3><p>Ferramentas digitais</p></button>
         </div>
+        <div class="subcategories" id="subcategories" style="display:none"></div>
       </div>
     </section>
 
     <section id="produtos">
       <div class="container">
-        <div class="section-head"><div><h2>Produtos</h2><p>Confira o catálogo da NEXVY.</p></div></div>
+        <div class="section-head"><div><h2 id="productSectionTitle">Produtos</h2><p>Escolha uma categoria e depois o produto desejado.</p></div></div>
         <div class="toolbar">
           <div class="searchbox">⌕ <input id="search" placeholder="Pesquisar produto..."></div>
-          <select id="category"><option value="all">Todas as categorias</option><option>Discord</option><option>Streaming</option><option>Games</option><option>Social</option><option>Design</option><option>Produtividade</option><option>Music</option></select>
+          <select id="category"><option value="all">Todas as categorias</option><option>Discord</option><option>Spotify</option><option>Streaming</option><option>Games</option><option>Social</option><option>Design</option><option>Produtividade</option></select>
           <select id="sort"><option value="default">Ordenar</option><option value="low">Menor preço</option><option value="high">Maior preço</option><option value="name">Nome</option></select>
         </div>
         <div class="products" id="products"></div>
@@ -204,7 +218,16 @@
       <div class="modal-icon" id="modalIcon">✨</div>
       <h2 id="modalTitle"></h2>
       <p id="modalDescription"></p>
-      <div class="modal-price" id="modalPrice"></div>
+      <div class="quantity-box" id="quantityBox" style="display:none">
+        <label>Quantidade (<span id="quantityUnit">unidade</span>)</label>
+        <div class="quantity-controls">
+          <button id="quantityMinus" type="button">−</button>
+          <input id="quantityInput" type="number" min="1" value="1">
+          <button id="quantityPlus" type="button">+</button>
+        </div>
+        <div class="quantity-total">Total: <strong id="modalPrice">Consultar</strong></div>
+      </div>
+      <div class="modal-price" id="modalPriceFallback" style="display:none"></div>
       <button class="btn btn-primary full" id="modalAdd">Adicionar ao carrinho</button>
     </div>
   </div>
@@ -226,40 +249,48 @@
       0 = "Consultar"
     */
     const products = [
-      {id:1,name:"Discord Nitro",category:"Discord",price:0,icon:"💎",desc:"Assinatura Discord Nitro."},
-      {id:2,name:"Discord Boosts",category:"Discord",price:0,icon:"🚀",desc:"Impulsos para servidor Discord."},
-      {id:3,name:"Discord Members",category:"Discord",price:0,icon:"👥",desc:"Serviço relacionado a membros para servidor."},
-      {id:4,name:"Steam Keys",category:"Games",price:0,icon:"🎮",desc:"Chaves digitais para jogos Steam."},
-      {id:5,name:"Robux",category:"Games",price:0,icon:"🪙",desc:"Moeda virtual para experiências compatíveis."},
-      {id:6,name:"HBO",category:"Streaming",price:0,icon:"🎬",desc:"Serviço de streaming. Consulte disponibilidade."},
-      {id:7,name:"Netflix",category:"Streaming",price:0,icon:"🎥",desc:"Serviço de streaming. Consulte disponibilidade."},
-      {id:8,name:"Crunchyroll",category:"Streaming",price:0,icon:"🍥",desc:"Streaming de anime. Consulte disponibilidade."},
-      {id:9,name:"Disney+",category:"Streaming",price:0,icon:"🏰",desc:"Serviço de streaming. Consulte disponibilidade."},
-      {id:10,name:"Canva Pro",category:"Design",price:0,icon:"🎨",desc:"Ferramentas premium de design. Consulte disponibilidade."},
-      {id:11,name:"ChatGPT Pro",category:"Produtividade",price:0,icon:"🤖",desc:"Produto/serviço digital. Consulte disponibilidade e condições."},
-      {id:12,name:"CapCut Pro",category:"Design",price:0,icon:"✂️",desc:"Recursos premium de edição. Consulte disponibilidade."},
-      {id:13,name:"Spotify Premium — 1 mês",category:"Music",price:0,icon:"🎵",desc:"Plano de música. Consulte disponibilidade."},
-      {id:14,name:"Spotify Premium — 3 meses",category:"Music",price:0,icon:"🎧",desc:"Plano de música. Consulte disponibilidade."},
-      {id:15,name:"Spotify Premium — Eterno",category:"Music",price:0,icon:"♾️",desc:"Oferta anunciada pela loja. Consulte condições e disponibilidade."},
-      {id:16,name:"Instagram — Seguidores",category:"Social",price:0,icon:"📸",desc:"Serviço para Instagram. Verifique as regras da plataforma."},
-      {id:17,name:"Instagram — Curtidas",category:"Social",price:0,icon:"❤️",desc:"Serviço para Instagram. Verifique as regras da plataforma."},
-      {id:18,name:"Instagram — Visualizações",category:"Social",price:0,icon:"👁️",desc:"Serviço para Instagram. Verifique as regras da plataforma."},
-      {id:19,name:"TikTok — Seguidores",category:"Social",price:0,icon:"🎵",desc:"Serviço para TikTok. Verifique as regras da plataforma."},
-      {id:20,name:"TikTok — Curtidas",category:"Social",price:0,icon:"❤️",desc:"Serviço para TikTok. Verifique as regras da plataforma."},
-      {id:21,name:"TikTok — Visualizações",category:"Social",price:0,icon:"👀",desc:"Serviço para TikTok. Verifique as regras da plataforma."},
-      {id:22,name:"TikTok — Reposts",category:"Social",price:0,icon:"🔁",desc:"Serviço para TikTok. Verifique as regras da plataforma."},
-      {id:23,name:"YouTube — Seguidores",category:"Social",price:0,icon:"▶️",desc:"Serviço para YouTube. Verifique as regras da plataforma."},
-      {id:24,name:"YouTube — Curtidas",category:"Social",price:0,icon:"👍",desc:"Serviço para YouTube. Verifique as regras da plataforma."},
-      {id:25,name:"YouTube — Visualizações",category:"Social",price:0,icon:"▶️",desc:"Serviço para YouTube. Verifique as regras da plataforma."},
-      {id:26,name:"Facebook — Seguidores",category:"Social",price:0,icon:"f",desc:"Serviço para Facebook. Verifique as regras da plataforma."},
-      {id:27,name:"Facebook — Curtidas",category:"Social",price:0,icon:"👍",desc:"Serviço para Facebook. Verifique as regras da plataforma."},
-      {id:28,name:"Facebook — Visualizações",category:"Social",price:0,icon:"👁️",desc:"Serviço para Facebook. Verifique as regras da plataforma."},
-      {id:29,name:"Telegram Members",category:"Social",price:0,icon:"✈️",desc:"Serviço para Telegram. Verifique as regras da plataforma."},
-      
+      {id:1,name:"Discord Nitro — 1 mês",group:"Discord",subgroup:"Nitro",price:0,icon:"💎",desc:"Assinatura Discord Nitro por 1 mês."},
+      {id:2,name:"Discord Nitro — 3 meses",group:"Discord",subgroup:"Nitro",price:0,icon:"💎",desc:"Assinatura Discord Nitro por 3 meses."},
+      {id:3,name:"Discord Boosts",group:"Discord",subgroup:"Boosts",price:0,icon:"🚀",desc:"Impulsos para servidor Discord."},
+      {id:4,name:"Discord Members — 100 OFF",group:"Discord",subgroup:"Membros",price:0,icon:"👥",desc:"Pacote de 100 membros offline."},
+      {id:5,name:"Discord Members — 200 OFF",group:"Discord",subgroup:"Membros",price:0,icon:"👥",desc:"Pacote de 200 membros offline."},
+      {id:6,name:"Discord Members — 300 OFF",group:"Discord",subgroup:"Membros",price:0,icon:"👥",desc:"Pacote de 300 membros offline."},
+      {id:7,name:"Discord Members — 50 ONLINE",group:"Discord",subgroup:"Membros",price:0,icon:"🟢",desc:"Pacote de 50 membros online."},
+      {id:8,name:"Discord — 50 reações em mensagem",group:"Discord",subgroup:"Membros",price:0,icon:"❤️",desc:"Pacote de 50 reações em mensagem."},
+      {id:9,name:"Spotify Premium — 1 mês",group:"Spotify",subgroup:"Planos",price:0,icon:"🎵",desc:"Plano de música por 1 mês."},
+      {id:10,name:"Spotify Premium — 3 meses",group:"Spotify",subgroup:"Planos",price:0,icon:"🎧",desc:"Plano de música por 3 meses."},
+      {id:11,name:"Spotify Premium — Eterno",group:"Spotify",subgroup:"Planos",price:0,icon:"♾️",desc:"Oferta anunciada pela loja. Consulte condições e disponibilidade."},
+      {id:12,name:"HBO",group:"Streaming",subgroup:"HBO",price:0,icon:"🎬",desc:"Serviço de streaming. Consulte disponibilidade."},
+      {id:13,name:"Netflix",group:"Streaming",subgroup:"Netflix",price:0,icon:"🎥",desc:"Serviço de streaming. Consulte disponibilidade."},
+      {id:14,name:"Crunchyroll",group:"Streaming",subgroup:"Crunchyroll",price:0,icon:"🍥",desc:"Streaming de anime. Consulte disponibilidade."},
+      {id:15,name:"Disney+",group:"Streaming",subgroup:"Disney+",price:0,icon:"🏰",desc:"Serviço de streaming. Consulte disponibilidade."},
+      {id:16,name:"Steam Keys",group:"Games",subgroup:"Steam",price:0,icon:"🎮",desc:"Chaves digitais para jogos Steam."},
+      {id:17,name:"Robux",group:"Games",subgroup:"Robux",price:0,icon:"🪙",desc:"Moeda virtual para experiências compatíveis."},
+      {id:18,name:"Instagram — Seguidores",group:"Social",subgroup:"Instagram",price:0,unitPrice:0,unitLabel:"seguidor",icon:"📸",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:19,name:"Instagram — Curtidas",group:"Social",subgroup:"Instagram",price:0,unitPrice:0,unitLabel:"curtida",icon:"❤️",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:20,name:"Instagram — Visualizações",group:"Social",subgroup:"Instagram",price:0,unitPrice:0,unitLabel:"visualização",icon:"👁️",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:21,name:"TikTok — Seguidores",group:"Social",subgroup:"TikTok",price:0,unitPrice:0,unitLabel:"seguidor",icon:"🎵",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:22,name:"TikTok — Curtidas",group:"Social",subgroup:"TikTok",price:0,unitPrice:0,unitLabel:"curtida",icon:"❤️",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:23,name:"TikTok — Visualizações",group:"Social",subgroup:"TikTok",price:0,unitPrice:0,unitLabel:"visualização",icon:"👀",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:24,name:"TikTok — Reposts",group:"Social",subgroup:"TikTok",price:0,unitPrice:0,unitLabel:"repost",icon:"🔁",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:25,name:"YouTube — Seguidores",group:"Social",subgroup:"YouTube",price:0,unitPrice:0,unitLabel:"seguidor",icon:"▶️",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:26,name:"YouTube — Curtidas",group:"Social",subgroup:"YouTube",price:0,unitPrice:0,unitLabel:"curtida",icon:"👍",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:27,name:"YouTube — Visualizações",group:"Social",subgroup:"YouTube",price:0,unitPrice:0,unitLabel:"visualização",icon:"▶️",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:28,name:"Canva Pro",group:"Design",subgroup:"Canva",price:0,icon:"🎨",desc:"Ferramentas premium de design. Consulte disponibilidade."},
+      {id:29,name:"CapCut Pro",group:"Design",subgroup:"CapCut",price:0,icon:"✂️",desc:"Recursos premium de edição. Consulte disponibilidade."},
+      {id:30,name:"ChatGPT Pro",group:"Produtividade",subgroup:"ChatGPT",price:0,icon:"🤖",desc:"Produto/serviço digital. Consulte disponibilidade e condições."},
+      {id:31,name:"Facebook — Seguidores",group:"Social",subgroup:"Facebook",price:0,unitPrice:0,unitLabel:"seguidor",icon:"f",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:32,name:"Facebook — Curtidas",group:"Social",subgroup:"Facebook",price:0,unitPrice:0,unitLabel:"curtida",icon:"👍",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:33,name:"Facebook — Visualizações",group:"Social",subgroup:"Facebook",price:0,unitPrice:0,unitLabel:"visualização",icon:"👁️",desc:"Quantidade configurável. Defina o preço por unidade no código."},
+      {id:34,name:"Telegram Members",group:"Social",subgroup:"Telegram",price:0,icon:"✈️",desc:"Serviço relacionado a membros do Telegram. Verifique as regras da plataforma."},
+      {id:35,name:"Discord Store",group:"Discord",subgroup:"Loja",price:0,icon:"🏪",desc:"Serviços e suporte relacionados à loja Discord."},
+      {id:36,name:"Discord Support",group:"Discord",subgroup:"Suporte",price:0,icon:"🛟",desc:"Atendimento e suporte da NEXVY."}
     ];
 
     let cart = JSON.parse(localStorage.getItem("nexvy_cart") || "[]");
     let currentProduct = null;
+    let currentGroup = null;
+    let currentSubgroup = null;
 
     const $ = s => document.querySelector(s);
     const money = n => n > 0 ? n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}) : "Consultar";
@@ -267,21 +298,40 @@
     function save(){localStorage.setItem("nexvy_cart",JSON.stringify(cart))}
     function toast(msg){const el=$("#toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),2200)}
 
+    function groupSubgroups(group){
+      return [...new Set(products.filter(p=>p.group===group).map(p=>p.subgroup))];
+    }
+
+    function renderSubcategories(){
+      const box=$("#subcategories");
+      if(!currentGroup){box.style.display="none";box.innerHTML="";return}
+      const subs=groupSubgroups(currentGroup);
+      box.style.display="block";
+      box.innerHTML=`<button class="back-category" onclick="backToCategories()">← Voltar para categorias</button>
+        <div class="subcategories">${subs.map(sub=>{
+          const p=products.find(x=>x.group===currentGroup&&x.subgroup===sub);
+          const count=products.filter(x=>x.group===currentGroup&&x.subgroup===sub).length;
+          return `<button class="subcat" onclick="selectSubcategory(${JSON.stringify(sub)})"><div class="subcat-icon">${p?.icon||"📦"}</div><h3>${sub}</h3><p>${count} ${count===1?"produto":"produtos"}</p></button>`;
+        }).join("")}</div>`;
+    }
+
     function renderProducts(){
       let list=[...products];
       const q=$("#search").value.toLowerCase().trim(), cat=$("#category").value, sort=$("#sort").value;
-      if(q) list=list.filter(p=>(p.name+" "+p.category+" "+p.desc).toLowerCase().includes(q));
-      if(cat!=="all") list=list.filter(p=>p.category===cat);
-      if(sort==="low") list.sort((a,b)=>a.price-b.price);
-      if(sort==="high") list.sort((a,b)=>b.price-a.price);
+      if(currentGroup) list=list.filter(p=>p.group===currentGroup);
+      if(currentSubgroup) list=list.filter(p=>p.subgroup===currentSubgroup);
+      if(q) list=list.filter(p=>(p.name+" "+p.group+" "+p.subgroup+" "+p.desc).toLowerCase().includes(q));
+      if(cat!=="all") list=list.filter(p=>p.group===cat);
+      if(sort==="low") list.sort((a,b)=>(a.unitPrice||a.price)-(b.unitPrice||b.price));
+      if(sort==="high") list.sort((a,b)=>(b.unitPrice||b.price)-(a.unitPrice||a.price));
       if(sort==="name") list.sort((a,b)=>a.name.localeCompare(b.name));
       $("#products").innerHTML=list.length?list.map(p=>`
         <article class="product">
           <div class="product-img">${p.icon}</div>
           <div class="product-body">
-            <div class="tag">${p.category}</div>
+            <div class="tag">${p.group} · ${p.subgroup}</div>
             <h3>${p.name}</h3><p>${p.desc}</p>
-            <div class="product-bottom"><span class="price">${money(p.price)}</span>
+            <div class="product-bottom"><span class="price">${p.unitPrice>0?money(p.unitPrice)+" / unidade":money(p.price)}</span>
               <button class="add" onclick="openProduct(${p.id})">Ver produto</button>
             </div>
           </div>
@@ -293,29 +343,64 @@
       if(!cart.length){$("#cartItems").innerHTML='<div class="empty">Seu carrinho está vazio.</div>';$("#cartTotal").textContent="R$ 0,00";return}
       $("#cartItems").innerHTML=cart.map(i=>`
         <div class="cart-item">
-          <div><h4>${i.name}</h4><p>${money(i.price)} cada</p>
+          <div><h4>${i.name}</h4><p>${i.unitPrice>0?money(i.unitPrice)+" por unidade":money(i.price)} cada</p>
             <div class="qty"><button onclick="changeQty(${i.id},-1)">−</button><span>${i.qty}</span><button onclick="changeQty(${i.id},1)">+</button>
             <button class="remove" onclick="removeItem(${i.id})">Remover</button></div>
-          </div><strong>${i.price?money(i.price*i.qty):"Consultar"}</strong>
+          </div><strong>${(i.unitPrice||i.price)?money((i.unitPrice||i.price)*i.qty):"Consultar"}</strong>
         </div>`).join("");
-      const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
-      $("#cartTotal").textContent=total?money(total):"Consultar";
+      const total=cart.reduce((s,i)=>s+(i.unitPrice||i.price)*i.qty,0);
+      const hasConsultar=cart.some(i=>(i.unitPrice||i.price)===0);
+      $("#cartTotal").textContent=hasConsultar?(total?money(total)+" + Consultar":"Consultar"):(money(total));
     }
 
     window.openProduct=id=>{
       currentProduct=products.find(p=>p.id===id);
-      $("#modalCategory").textContent=currentProduct.category;
+      $("#modalCategory").textContent=currentProduct.group+" · "+currentProduct.subgroup;
       $("#modalIcon").textContent=currentProduct.icon;
       $("#modalTitle").textContent=currentProduct.name;
       $("#modalDescription").textContent=currentProduct.desc;
-      $("#modalPrice").textContent=money(currentProduct.price);
+      const qbox=$("#quantityBox");
+      if(currentProduct.unitPrice!==undefined){
+        qbox.style.display="block";
+        $("#quantityInput").value=1;
+        $("#quantityUnit").textContent=currentProduct.unitLabel||"unidade";
+        updateQuantityPrice();
+      }else{
+        qbox.style.display="none";
+        $("#modalPrice").textContent=money(currentProduct.price);
+      }
       $("#productOverlay").classList.add("open");
+    };
+
+    function updateQuantityPrice(){
+      if(!currentProduct)return;
+      const qty=Math.max(1,parseInt($("#quantityInput").value||1,10));
+      $("#quantityInput").value=qty;
+      const total=(currentProduct.unitPrice||0)*qty;
+      $("#modalPrice").textContent=total>0?money(total):"Consultar";
+      $("#quantityUnit").textContent=currentProduct.unitLabel||"unidade";
+    }
+
+    window.selectSubcategory=sub=>{
+      currentSubgroup=sub;
+      renderProducts();
+      $("#produtos").scrollIntoView({behavior:"smooth"});
+      const head=$("#productSectionTitle");
+      if(head) head.textContent=currentGroup+" · "+sub;
+    };
+    window.backToCategories=()=>{
+      currentGroup=null;currentSubgroup=null;
+      $("#category").value="all";
+      $("#productSectionTitle").textContent="Produtos";
+      renderSubcategories();renderProducts();
     };
 
     $("#modalAdd").onclick=()=>{
       if(!currentProduct)return;
+      let qty=1;
+      if(currentProduct.unitPrice!==undefined)qty=Math.max(1,parseInt($("#quantityInput").value||1,10));
       const item=cart.find(i=>i.id===currentProduct.id);
-      if(item)item.qty++;else cart.push({...currentProduct,qty:1});
+      if(item)item.qty+=qty;else cart.push({...currentProduct,qty});
       save();renderCart();$("#productOverlay").classList.remove("open");toast("Produto adicionado ao carrinho.");
     };
 
@@ -332,6 +417,10 @@
     $("#closeProduct").onclick=()=>$("#productOverlay").classList.remove("open");
     $("#productOverlay").onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove("open")};
 
+    $("#quantityInput").addEventListener("input",updateQuantityPrice);
+    $("#quantityMinus").onclick=()=>{$("#quantityInput").value=Math.max(1,parseInt($("#quantityInput").value||1,10)-1);updateQuantityPrice()};
+    $("#quantityPlus").onclick=()=>{$("#quantityInput").value=Math.max(1,parseInt($("#quantityInput").value||1,10)+1);updateQuantityPrice()};
+
     $("#openSearch").onclick=()=>{ $("#searchOverlay").classList.add("open");$("#searchModal").focus() };
     $("#closeSearch").onclick=()=>$("#searchOverlay").classList.remove("open");
     $("#searchOverlay").onclick=e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove("open")};
@@ -339,19 +428,31 @@
 
     ["search","category","sort"].forEach(id=>$("#"+id).addEventListener("input",renderProducts));
     document.querySelectorAll(".cat").forEach(b=>b.addEventListener("click",()=>{
-      $("#category").value=b.dataset.category;document.querySelector("#produtos").scrollIntoView({behavior:"smooth"});renderProducts();
+      currentGroup=b.dataset.group;currentSubgroup=null;
+      $("#category").value="all";
+      $("#productSectionTitle").textContent=currentGroup;
+      const subs=groupSubgroups(currentGroup);
+      if(subs.length===1){
+        currentSubgroup=subs[0];
+        $("#subcategories").style.display="none";
+      }else{
+        renderSubcategories();
+      }
+      $("#produtos").scrollIntoView({behavior:"smooth"});
+      renderProducts();
     }));
 
     $("#checkout").onclick=async()=>{
       if(!cart.length){toast("Seu carrinho está vazio.");return}
-      const lines=cart.map(i=>`• ${i.name} x${i.qty} — ${i.price?money(i.price*i.qty):"Consultar"}`).join("\n");
-      const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
-      const text=`Olá! Quero fazer um pedido na NEXVY:\n\n${lines}\n\nTotal: ${total?money(total):"Consultar"}`;
+      const lines=cart.map(i=>`• ${i.name} x${i.qty} — ${(i.unitPrice||i.price)?money((i.unitPrice||i.price)*i.qty):"Consultar"}`).join("\n");
+      const total=cart.reduce((s,i)=>s+(i.unitPrice||i.price)*i.qty,0);
+      const hasConsultar=cart.some(i=>(i.unitPrice||i.price)===0);
+      const text=`Olá! Quero fazer um pedido na NEXVY:\n\n${lines}\n\nTotal: ${hasConsultar?(total?money(total)+" + Consultar":"Consultar"):money(total)}`;
       try{await navigator.clipboard.writeText(text);toast("Resumo copiado! Abrindo Discord...")}catch(e){toast("Abrindo Discord...")}
       window.open("https://discord.gg/jXRWPKA7k","_blank");
     };
 
-    renderProducts();renderCart();
+    renderSubcategories();renderProducts();renderCart();
   </script>
 </body>
 </html>
