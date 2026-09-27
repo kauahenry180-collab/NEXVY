@@ -43,14 +43,26 @@
 <footer class="footer"><div class="footerBrand">♛ NEXVY</div><div>© 2026 NEXVY — Todos os direitos reservados.</div><div class="socials"><span>◎</span><span>♪</span><span>▶</span><span>𝕏</span><span>♧</span></div></footer>
 <div class="modal" id="modal"><div class="modalBox"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
 <script>
-const products=[
-['Discord Nitro 1 mês','Discord','💬','Consultar'],['Discord Nitro 3 meses','Discord','💬','Consultar'],['Spotify Premium 1 mês','Spotify','🎵','R$ 1,00'],['Netflix Premium 1 mês','Streaming','N','Consultar'],['Disney+ Premium 1 mês','Streaming','◉','Consultar'],['HBO Max Premium 1 mês','Streaming','HBO','Consultar'],['ChatGPT Plus 1 mês','Produtividade','AI','Consultar'],['Discord Boosts','Discord','🚀','Consultar'],['Discord Members — 100 OFF','Discord','👥','Consultar'],['Discord Members — 200 OFF','Discord','👥','Consultar'],['Discord Members — 300 OFF','Discord','👥','Consultar'],['Discord Members — 50 ON','Discord','👥','Consultar'],['Discord Members — 50 Reações','Discord','❤️','Consultar'],['Spotify Premium 3 meses','Spotify','🎵','R$ 3,00'],['Spotify Premium Eterno','Spotify','♾','R$ 9,50'],['Instagram — Seguidores','Social','◎','Consultar'],['Instagram — Curtidas','Social','♥','Consultar'],['Instagram — Visualizações','Social','◉','Consultar'],['TikTok — Seguidores','Social','♪','Consultar'],['TikTok — Curtidas','Social','♥','Consultar'],['TikTok — Visualizações','Social','◉','Consultar'],['TikTok — Reposts','Social','↻','Consultar'],['YouTube — Seguidores','Social','▶','Consultar'],['YouTube — Curtidas','Social','👍','Consultar'],['YouTube — Visualizações','Social','▶','Consultar'],['Canva Pro','Design','C','Consultar'],['CapCut Pro','Design','✂','Consultar'],['Steam Keys','Games','🎮','Consultar'],['Robux','Games','🪙','Consultar'],['Facebook — Seguidores','Social','f','Consultar'],['Telegram Members','Social','✈','Consultar']
-];
+let products=[];
 let cart=[];let active='Todos';
 const $=s=>document.querySelector(s);
-function render(){const q=($('#search').value||$('#topSearch').value||'').toLowerCase();const box=$('#products');box.innerHTML='';products.filter(p=>(active==='Todos'||p[1]===active)&&p[0].toLowerCase().includes(q)).forEach((p,i)=>{const d=document.createElement('div');d.className='product';d.innerHTML=`<div class="pIcon"><span class="bigEmoji">${p[2]}</span></div><h3>${p[0]}</h3><div class="meta">${p[1]} • ${p[1]==='Social'?'Serviço':'Produto'}</div><div class="price">${p[3]}</div><button class="add" onclick="add(${i},'${encodeURIComponent(p[0])}')">Adicionar</button>`;box.appendChild(d)})}
+function render(){
+ const q=(($('#search').value||$('#topSearch').value||'')).toLowerCase();
+ const box=$('#products');box.innerHTML='';
+ products.filter(p=>(active==='Todos'||p[1]===active)&&p[0].toLowerCase().includes(q))
+ .forEach(p=>{
+  const d=document.createElement('div');d.className='product';
+  const price=typeof p[3]==='number' ? p[3].toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : (p[3]||'Consultar');
+  const unavailable=!p.unlimited && Number(p.stock||0)<=0;
+  d.innerHTML=`<div class="pIcon"><span class="bigEmoji">${esc(p[2]||'📦')}</span></div><h3>${esc(p[0])}</h3><div class="meta">${esc(p[1])} • ${p[1]==='Social'?'Serviço':'Produto'}</div><div class="price">${esc(price)}</div><button class="add" ${unavailable?'disabled':''}>${unavailable?'ESGOTADO':'Adicionar'}</button>`;
+  const btn=d.querySelector('.add');
+  if(unavailable)btn.style.opacity='.5';
+  else btn.addEventListener('click',()=>add(p));
+  box.appendChild(d);
+ });
+}
 function filterCat(c){active=c;document.querySelector('#produtos').scrollIntoView({behavior:'smooth'});render()}
-function add(i){const p=products[i];cart.push(p);$('#cartCount').textContent=cart.length;openCart()}
+function add(p){cart.push(p);$('#cartCount').textContent=cart.length;openCart()}
 function openCart(){openModal(`<h2>Seu carrinho</h2>${cart.length?cart.map((p,i)=>`<div class="cartLine"><span>${p[0]}</span><b>${p[3]}</b></div>`).join(''):'<div class="empty">Seu carrinho está vazio.</div>'}<button class="sideBtn" style="margin-top:15px" onclick="finish()">FINALIZAR PELO DISCORD</button>`)}
 function finish(){window.open('https://discord.gg/jXRWPKA7k','_blank')}
 function getAccounts(){try{return JSON.parse(localStorage.getItem('nexvy_accounts')||'[]')}catch(e){return[]}}
@@ -90,5 +102,43 @@ function logout(){setCurrentUser(null);showLogin()}
 function openModal(html){$('#modalContent').innerHTML=html;$('#modal').classList.add('show')}
 function closeModal(){$('#modal').classList.remove('show')}
 $('#search').addEventListener('input',render);$('#topSearch').addEventListener('input',()=>{ $('#search').value=$('#topSearch').value;render()});$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});render();
+</script>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB5dToSKOQdle6oyo78Hyz3g8qvcVOXYk",
+  authDomain: "nexvy-admin.firebaseapp.com",
+  projectId: "nexvy-admin",
+  storageBucket: "nexvy-admin.firebasestorage.app",
+  messagingSenderId: "123694938053",
+  appId: "1:123694938053:web:f8b7be516bf2edb9f8fdac",
+  measurementId: "G-HVD3GRL2X6"
+};
+
+try {
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const snapshot = await getDocs(collection(db, 'products'));
+  products = snapshot.docs
+    .map(doc => ({ id: doc.id, ...doc.data() }))
+    .filter(p => p.active !== false)
+    .sort((a,b) => Number(a.order ?? 0) - Number(b.order ?? 0))
+    .map(p => [
+      String(p.name || 'Produto'),
+      String(p.category || 'Outros'),
+      String(p.icon || '📦'),
+      p.price === null || p.price === undefined || p.price === '' ? 'Consultar' : p.price,
+      p.stock ?? 0,
+      p.unlimited === true
+    ]);
+  render();
+} catch (error) {
+  console.error('Falha ao carregar produtos do Firestore:', error);
+  const box = document.querySelector('#products');
+  if (box) box.innerHTML = '<p style="color:#ffaaaa">Não foi possível carregar os produtos. Atualize a página ou confira as regras do Firestore.</p>';
+}
 </script>
 </body></html>
