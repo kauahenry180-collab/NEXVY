@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXVY — Painel Admin</title>
+<style>
+:root{--bg:#05040c;--panel:#0d0a19;--panel2:#120e21;--line:#39205e;--purple:#8b3dff;--purple2:#b47aff;--text:#f7f4ff;--muted:#aaa2bd;--green:#42d6a0;--yellow:#f4c76b;--red:#ff727f}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#241044 0,#090712 42%,#05040c 78%);color:var(--text);font:14px Arial,Helvetica,sans-serif;min-height:100vh}
+button,input,select{font:inherit}button{cursor:pointer}.app{display:grid;grid-template-columns:245px 1fr;min-height:100vh}
+.sidebar{background:rgba(8,6,17,.96);border-right:1px solid var(--line);padding:25px 16px;display:flex;flex-direction:column;gap:26px}.brand{font-size:25px;font-weight:900;letter-spacing:-1px;padding:0 12px}.brand span{color:var(--purple2)}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:2px;margin-top:5px}
+.nav{display:grid;gap:8px}.nav button{border:1px solid transparent;background:transparent;color:#c9c1d9;text-align:left;padding:13px 14px;border-radius:10px;font-weight:700}.nav button.active,.nav button:hover{background:#1b1030;border-color:#51268b;color:white}.nav b{display:inline-block;width:27px;color:var(--purple2);font-size:16px}.side-note{margin-top:auto;padding:14px;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:12px;line-height:1.6}
+main{padding:30px;max-width:1500px;width:100%;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:26px}.eyebrow{font-size:11px;color:var(--purple2);font-weight:800;letter-spacing:2px}.top h1{font-size:27px;margin:7px 0 0}.top p{color:var(--muted);margin:7px 0 0}.pill{border:1px solid #4b2b76;background:#160e28;color:#d9c5ff;border-radius:30px;padding:10px 14px;font-size:12px;font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:22px}.stat{background:linear-gradient(145deg,#130e22,#0b0914);border:1px solid var(--line);border-radius:15px;padding:19px}.stat label{color:var(--muted);font-size:12px}.stat strong{display:block;font-size:29px;margin-top:12px}.stat small{display:block;color:var(--muted);margin-top:5px}
+.panel{background:rgba(13,10,25,.94);border:1px solid var(--line);border-radius:15px;overflow:hidden}.panel-head{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #28183f}.panel-head h2{font-size:16px;margin:0}.tools{display:flex;gap:9px;flex-wrap:wrap}.field,select{background:#080711;border:1px solid #4b2b76;color:white;border-radius:9px;padding:11px 12px;outline:none}.field:focus,select:focus{border-color:var(--purple2)}.search{width:230px}.btn{border:1px solid #6331a0;background:#201039;color:white;padding:11px 15px;border-radius:9px;font-weight:700}.btn.primary{background:linear-gradient(100deg,#7028d7,#9a4dff);border-color:#a56bff}.btn:hover{filter:brightness(1.12)}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:15px 19px;border-bottom:1px solid #21172f}th{font-size:11px;color:#aaa0bc;text-transform:uppercase;letter-spacing:1px}td{font-size:13px}.prod-name{font-weight:700}.prod-cat{color:var(--muted);font-size:12px;margin-top:5px}.status{display:inline-block;padding:6px 9px;border-radius:20px;font-size:11px;font-weight:700}.ok{background:#103126;color:var(--green)}.low{background:#382b12;color:var(--yellow)}.out{background:#391923;color:var(--red)}.unlimited{background:#291744;color:#d2a8ff}.actions{display:flex;gap:7px}.mini{background:#171024;border:1px solid #493064;color:#eee;border-radius:7px;padding:7px 9px}.mini.danger{color:#ff9aa4}.empty{text-align:center;color:var(--muted);padding:35px}
+.overlay{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:18px;z-index:5}.overlay.show{display:flex}.modal{width:min(510px,100%);background:#100c1d;border:1px solid #6736a0;border-radius:16px;padding:22px;box-shadow:0 20px 80px #000a}.modal h2{margin:0 0 18px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.formrow{display:grid;gap:7px}.formrow.full{grid-column:1/-1}.formrow label{font-size:12px;color:#c8bfd7}.formrow input,.formrow select{width:100%}.check{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}.hint{color:var(--muted);font-size:12px;line-height:1.6;margin-top:14px}
+@media(max-width:800px){.app{grid-template-columns:1fr}.sidebar{padding:13px 14px;border-right:0;border-bottom:1px solid var(--line);gap:12px}.brand{padding:0 4px}.brand small{display:inline;margin-left:8px}.nav{display:flex;overflow:auto}.nav button{white-space:nowrap;padding:10px}.side-note{display:none}main{padding:20px 14px}.cards{gap:9px}.stat{padding:14px}.stat strong{font-size:23px}.top{align-items:flex-start}.pill{display:none}}
+@media(max-width:480px){.cards{grid-template-columns:1fr}.top h1{font-size:23px}.search{width:100%}.panel-head{align-items:flex-start;flex-direction:column}.tools{width:100%}.tools .search{flex:1;min-width:130px}.formgrid{grid-template-columns:1fr}.formrow.full{grid-column:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+<div class="brand">♛ NEXVY <span>ADMIN</span><small>PAINEL DE CONTROLE</small></div>
+<nav class="nav"><button class="active" data-page="dashboard"><b>▦</b> Visão geral</button><button data-page="products"><b>▣</b> Produtos e estoque</button></nav>
+<div class="side-note">Painel inicial de gerenciamento.<br>As alterações ficam salvas neste navegador enquanto a loja não estiver conectada a um banco de dados.</div>
+</aside>
+<main>
+<header class="top"><div><div class="eyebrow">NEXVY / ADMINISTRAÇÃO</div><h1 id="pageTitle">Visão geral</h1><p id="pageDesc">Acompanhe seus produtos e disponibilidade.</p></div><div class="pill">● MODO LOCAL</div></header>
+<section id="dashboard">
+<div class="cards">
+<div class="stat"><label>Produtos cadastrados</label><strong id="totalProducts">0</strong><small>Produtos no catálogo administrativo</small></div>
+<div class="stat"><label>Unidades em estoque</label><strong id="totalStock">0</strong><small>Somente estoque limitado</small></div>
+<div class="stat"><label>Sem estoque</label><strong id="outProducts">0</strong><small>Produtos com quantidade zerada</small></div>
+</div>
+<div class="panel"><div class="panel-head"><h2>Resumo de disponibilidade</h2><button class="btn" onclick="showPage('products')">Gerenciar produtos →</button></div><div class="table-wrap"><table><thead><tr><th>Produto</th><th>Preço</th><th>Estoque</th><th>Status</th></tr></thead><tbody id="summaryRows"></tbody></table></div></div>
+</section>
+<section id="productsPage" hidden>
+<div class="panel"><div class="panel-head"><h2>Catálogo de produtos</h2><div class="tools"><input id="search" class="field search" placeholder="Pesquisar produto..."><button class="btn primary" onclick="openForm()">＋ Novo produto</button></div></div><div class="table-wrap"><table><thead><tr><th>Produto</th><th>Preço</th><th>Estoque</th><th>Status</th><th>Ações</th></tr></thead><tbody id="productRows"></tbody></table></div></div>
+<p class="hint">Dica: “Estoque ilimitado” pode ser usado para produtos digitais sob consulta. Esta versão salva os dados no localStorage deste navegador; ainda não altera automaticamente a vitrine pública nem compartilha mudanças com outros visitantes.</p>
+</section>
+</main>
+</div>
+<div class="overlay" id="overlay"><div class="modal"><h2 id="modalTitle">Novo produto</h2><form id="productForm"><div class="formgrid">
+<div class="formrow full"><label for="name">Nome do produto</label><input class="field" id="name" required maxlength="90" placeholder="Ex.: Discord Nitro 1 mês"></div>
+<div class="formrow"><label for="category">Categoria</label><input class="field" id="category" required maxlength="40" placeholder="Ex.: Discord"></div>
+<div class="formrow"><label for="price">Preço (R$)</label><input class="field" id="price" type="number" min="0" step="0.01" placeholder="0,00"></div>
+<div class="formrow"><label for="stock">Quantidade em estoque</label><input class="field" id="stock" type="number" min="0" step="1" value="0"></div>
+<div class="formrow"><label for="icon">Ícone / emoji</label><input class="field" id="icon" maxlength="8" placeholder="📦"></div>
+<div class="formrow full"><label class="check"><input id="unlimited" type="checkbox"> Estoque ilimitado</label></div>
+</div><div class="modal-actions"><button type="button" class="btn" onclick="closeForm()">Cancelar</button><button class="btn primary" type="submit">Salvar produto</button></div></form></div></div>
+<script>
+const seed=[
+["Discord Nitro 1 mês","Discord","💬",null],["Discord Nitro 3 meses","Discord","💬",null],["Spotify Premium 1 mês","Spotify","🎵",1],["Netflix Premium 1 mês","Streaming","N",null],["Disney+ Premium 1 mês","Streaming","◉",null],["HBO Max Premium 1 mês","Streaming","HBO",null],["ChatGPT Plus 1 mês","Produtividade","AI",null],["Discord Boosts","Discord","🚀",null],["Discord Members — 100 OFF","Discord","👥",null],["Discord Members — 200 OFF","Discord","👥",null],["Discord Members — 300 OFF","Discord","👥",null],["Discord Members — 50 ON","Discord","👥",null],["Discord Members — 50 Reações","Discord","❤️",null],["Spotify Premium 3 meses","Spotify","🎵",3],["Spotify Premium Eterno","Spotify","♾",9.5],["Instagram — Seguidores","Social","◎",null],["Instagram — Curtidas","Social","♥",null],["Instagram — Visualizações","Social","◉",null],["TikTok — Seguidores","Social","♪",null],["TikTok — Curtidas","Social","♥",null],["TikTok — Visualizações","Social","◉",null],["TikTok — Reposts","Social","↻",null],["YouTube — Seguidores","Social","▶",null],["YouTube — Curtidas","Social","👍",null],["YouTube — Visualizações","Social","▶",null],["Canva Pro","Design","C",null],["CapCut Pro","Design","✂",null],["Steam Keys","Games","🎮",null],["Robux","Games","🪙",null],["Facebook — Seguidores","Social","f",null],["Telegram Members","Social","✈",null]
+].map((p,i)=>({id:i+1,name:p[0],category:p[1],icon:p[2],price:p[3],stock:0,unlimited:false,active:true}));
+let products;try{products=JSON.parse(localStorage.getItem('nexvy_admin_products'))||seed}catch(e){products=seed}
+let editingId=null;
+const $=id=>document.getElementById(id);
+const save=()=>localStorage.setItem('nexvy_admin_products',JSON.stringify(products));
+const money=v=>v===null||v===''?'Consultar':Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const status=p=>p.unlimited?['Ilimitado','unlimited']:p.stock<=0?['Sem estoque','out']:p.stock<=5?['Estoque baixo','low']:['Disponível','ok'];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function render(){ $('totalProducts').textContent=products.length;$('totalStock').textContent=products.filter(p=>!p.unlimited).reduce((a,p)=>a+Number(p.stock||0),0);$('outProducts').textContent=products.filter(p=>!p.unlimited&&Number(p.stock)<=0).length;
+$('summaryRows').innerHTML=products.slice(0,6).map(p=>row(p,false)).join('')||'<tr><td colspan="4" class="empty">Nenhum produto cadastrado.</td></tr>';
+const q=$('search').value.trim().toLowerCase();const list=products.filter(p=>(p.name+' '+p.category).toLowerCase().includes(q));$('productRows').innerHTML=list.map(p=>row(p,true)).join('')||'<tr><td colspan="5" class="empty">Nenhum produto encontrado.</td></tr>';
+}
+function row(p,actions){let [label,cls]=status(p);return `<tr><td><div class="prod-name">${esc(p.icon||'📦')} &nbsp;${esc(p.name)}</div><div class="prod-cat">${esc(p.category)}</div></td><td>${money(p.price)}</td><td>${p.unlimited?'∞':Number(p.stock||0)}</td><td><span class="status ${cls}">${label}</span></td>${actions?`<td><div class="actions"><button class="mini" onclick="editProduct(${p.id})">Editar</button><button class="mini danger" onclick="deleteProduct(${p.id})">Excluir</button></div></td>`:''}</tr>`}
+function showPage(page){const dash=page==='dashboard';$('dashboard').hidden=!dash;$('productsPage').hidden=dash;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));$('pageTitle').textContent=dash?'Visão geral':'Produtos e estoque';$('pageDesc').textContent=dash?'Acompanhe seus produtos e disponibilidade.':'Cadastre produtos, ajuste preços e controle quantidades.';render()}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+function openForm(p=null){editingId=p?.id??null;$('modalTitle').textContent=p?'Editar produto':'Novo produto';$('name').value=p?.name||'';$('category').value=p?.category||'';$('price').value=p?.price??'';$('stock').value=p?.stock??0;$('icon').value=p?.icon||'';$('unlimited').checked=!!p?.unlimited;$('overlay').classList.add('show');$('name').focus()}
+function closeForm(){$('overlay').classList.remove('show')}
+function editProduct(id){const p=products.find(x=>x.id===id);if(p)openForm(p)}
+function deleteProduct(id){const p=products.find(x=>x.id===id);if(p&&confirm(`Excluir "${p.name}" do painel?`)){products=products.filter(x=>x.id!==id);save();render()}}
+$('productForm').addEventListener('submit',e=>{e.preventDefault();const data={name:$('name').value.trim(),category:$('category').value.trim(),price:$('price').value===''?null:Number($('price').value),stock:$('unlimited').checked?0:Math.max(0,parseInt($('stock').value||'0',10)),icon:$('icon').value.trim()||'📦',unlimited:$('unlimited').checked,active:true};if(!data.name||!data.category)return;if(editingId!==null){products=products.map(p=>p.id===editingId?{...p,...data}:p)}else{data.id=Date.now();products.unshift(data)}save();closeForm();render()});
+$('search').addEventListener('input',render);$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))closeForm()});render();
+</script>
+</body></html>
