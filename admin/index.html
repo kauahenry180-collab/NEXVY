@@ -3,22 +3,76 @@
 :root{--bg:#0b0912;--panel:#171222;--line:#302642;--text:#f5f1ff;--muted:#a99fba;--purple:#9b6cff;--red:#ff6b78}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#211638,#0b0912 60%);color:var(--text);font:15px system-ui, sans-serif;min-height:100vh}.wrap{max-width:1150px;margin:auto;padding:25px 16px}.top,.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.brand{font-size:23px;font-weight:850}.brand span{color:#b99aff}.sub,small{color:var(--muted)}.card,.stat{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:20px}.login{max-width:430px;margin:8vh auto}.field{margin:13px 0}.field label{display:block;color:var(--muted);font-size:13px;margin-bottom:7px}input{width:100%;background:#0e0b16;border:1px solid #3a2e4e;border-radius:9px;color:white;padding:12px;font:inherit}button{background:#7543d6;color:white;border:0;border-radius:9px;padding:10px 14px;font:inherit;font-weight:650;cursor:pointer}button.secondary{background:#292139;border:1px solid var(--line)}button.danger{background:#49202d}.hidden{display:none!important}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin:18px 0}.stat strong{display:block;font-size:27px;margin-top:7px}.toolbar{margin-bottom:15px}.toolbar input{max-width:280px}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--line)}th{font-size:12px;color:var(--muted);text-transform:uppercase}.tablewrap{overflow:auto}.pill{background:#292139;border-radius:20px;padding:5px 9px;font-size:12px}.off{background:#48212b;color:#ffc3cb}.actions{display:flex;gap:6px}.actions button{font-size:12px;padding:7px 9px}.notice{font-size:13px;color:var(--muted);margin-top:12px}.error{color:#ff9aa5;margin-top:10px}.modal{position:fixed;inset:0;background:#000a;display:flex;align-items:center;justify-content:center;padding:14px}.modalbox{width:min(550px,100%);max-height:90vh;overflow:auto}.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}.full{grid-column:1/-1}.check{display:flex;align-items:center;gap:8px;margin:12px 0;color:var(--muted)}.check input{width:auto}@media(max-width:600px){.stats{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.full{grid-column:auto}.card{padding:16px}}
 </style></head><body><div class="wrap"><header class="top"><div><div class="brand">♛ NEXVY <span>ADMIN</span></div><div class="sub">Gerenciamento de produtos e estoque</div></div><button id="logout" class="secondary hidden">Sair</button></header>
 <section id="login" class="card login"><h2>Acesso administrativo</h2><p class="sub">Entre com sua conta autorizada.</p><form id="loginForm"><div class="field"><label>E-mail</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label>Senha</label><input id="password" type="password" autocomplete="current-password" required></div><button style="width:100%">Entrar</button><div id="loginMsg" class="error"></div></form><p class="notice">Nunca compartilhe sua senha.</p></section>
-<section id="app" class="hidden"><div class="stats"><div class="stat"><small>Produtos cadastrados</small><strong id="count">0</strong></div><div class="stat"><small>Unidades em estoque</small><strong id="stockCount">0</strong></div><div class="stat"><small>Sem estoque</small><strong id="outCount">0</strong></div></div><div class="card"><div class="toolbar"><div><h2 style="margin:0">Catálogo</h2><div class="sub">Alterações salvas no banco de dados.</div></div><div class="toolbar"><input id="search" placeholder="Pesquisar produto"><button id="newBtn">+ Novo produto</button></div></div><div class="tablewrap"><table><thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Status</th><th>Ações</th></tr></thead><tbody id="rows"></tbody></table></div><div id="listMsg" class="notice"></div></div></section></div>
+<section id="app" class="hidden"><div class="stats"><div class="stat"><small>Produtos cadastrados</small><strong id="count">0</strong></div><div class="stat"><small>Unidades em estoque</small><strong id="stockCount">0</strong></div><div class="stat"><small>Sem estoque</small><strong id="outCount">0</strong></div></div><div class="card"><div class="toolbar"><div><h2 style="margin:0">Catálogo</h2><div class="sub">Alterações salvas no banco de dados.</div></div><div class="toolbar"><input id="search" placeholder="Pesquisar produto"><button id="seedBtn" class="secondary">↻ Restaurar produtos padrão</button><button id="newBtn">+ Novo produto</button></div></div><div class="tablewrap"><table><thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Status</th><th>Ações</th></tr></thead><tbody id="rows"></tbody></table></div><div id="listMsg" class="notice"></div></div></section></div>
 <div id="modal" class="modal hidden"><div class="card modalbox"><div class="toolbar"><h2 id="modalTitle">Produto</h2><button id="closeModal" type="button" class="secondary">Fechar</button></div><form id="productForm"><input id="docId" type="hidden"><div class="grid"><div class="field"><label>Nome</label><input id="pName" required maxlength="120"></div><div class="field"><label>Categoria</label><input id="pCategory" required maxlength="80"></div><div class="field"><label>Preço (R$), vazio = Consultar</label><input id="pPrice" type="number" min="0" step="0.01"></div><div class="field"><label>Estoque</label><input id="pStock" type="number" min="0" step="1" value="0"></div><div class="field"><label>Ícone/emoji</label><input id="pIcon" maxlength="8" placeholder="📦"></div><div class="field"><label>Ordem (opcional)</label><input id="pOrder" type="number" step="1" value="0"></div></div><label class="check"><input id="pUnlimited" type="checkbox"> Estoque ilimitado</label><label class="check"><input id="pActive" type="checkbox" checked> Produto ativo/visível na loja</label><div class="toolbar"><button type="submit">Salvar produto</button><button id="deleteBtn" type="button" class="danger hidden">Excluir</button></div><div id="formMsg" class="error"></div></form></div></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {getFirestore,collection,getDocs,addDoc,updateDoc,deleteDoc,doc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 const firebaseConfig={apiKey:"AIzaSyB5dToSKfOQdle6oyo78Hyz3g8qvcVOXYk",authDomain:"nexvy-admin.firebaseapp.com",projectId:"nexvy-admin",storageBucket:"nexvy-admin.firebasestorage.app",messagingSenderId:"123694938053",appId:"1:123694938053:web:f8b7be516bf2edb9f8fdac",measurementId:"G-HVD3GRL2X6"};
-const fb=initializeApp(firebaseConfig),auth=getAuth(fb),db=getFirestore(fb),$=id=>document.getElementById(id);let products=[];
+const fb=initializeApp(firebaseConfig),auth=getAuth(fb),db=getFirestore(fb),$=id=>document.getElementById(id);let products=[];const defaultProducts=[
+{name:"Discord Nitro 1 mês",category:"Discord",icon:"💬"},
+{name:"Discord Nitro 3 meses",category:"Discord",icon:"💬"},
+{name:"Spotify Premium 1 mês",category:"Spotify",icon:"🎵"},
+{name:"Netflix Premium 1 mês",category:"Streaming",icon:"N"},
+{name:"Disney+ Premium 1 mês",category:"Streaming",icon:"◉"},
+{name:"HBO Max Premium 1 mês",category:"Streaming",icon:"HBO"},
+{name:"ChatGPT Plus 1 mês",category:"Produtividade",icon:"AI"},
+{name:"Discord Boosts",category:"Discord",icon:"🚀"},
+{name:"Discord Members — 100 OFF",category:"Discord",icon:"👥"},
+{name:"Discord Members — 200 OFF",category:"Discord",icon:"👥"},
+{name:"Discord Members — 300 OFF",category:"Discord",icon:"👥"},
+{name:"Discord Members — 50 ON",category:"Discord",icon:"👥"},
+{name:"Discord Members — 50 Reações",category:"Discord",icon:"❤️"},
+{name:"Spotify Premium 3 meses",category:"Spotify",icon:"🎵"},
+{name:"Spotify Premium Eterno",category:"Spotify",icon:"♾"},
+{name:"Instagram — Seguidores",category:"Social",icon:"◎"},
+{name:"Instagram — Curtidas",category:"Social",icon:"♥"},
+{name:"Instagram — Visualizações",category:"Social",icon:"◉"},
+{name:"TikTok — Seguidores",category:"Social",icon:"♪"},
+{name:"TikTok — Curtidas",category:"Social",icon:"♥"},
+{name:"TikTok — Visualizações",category:"Social",icon:"◉"},
+{name:"TikTok — Reposts",category:"Social",icon:"↻"},
+{name:"YouTube — Seguidores",category:"Social",icon:"▶"},
+{name:"YouTube — Curtidas",category:"Social",icon:"👍"},
+{name:"YouTube — Visualizações",category:"Social",icon:"▶"},
+{name:"Canva Pro",category:"Design",icon:"C"},
+{name:"CapCut Pro",category:"Design",icon:"✂"},
+{name:"Steam Keys",category:"Games",icon:"🎮"},
+{name:"Robux",category:"Games",icon:"🪙"},
+{name:"Facebook — Seguidores",category:"Social",icon:"f"},
+{name:"Telegram Members",category:"Social",icon:"✈"}
+];
 const money=v=>v===null||v===undefined||v===""?"Consultar":Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function status(p){if(!p.active)return["Oculto","off"];if(p.unlimited)return["Ilimitado",""];if(+p.stock<=0)return["Esgotado","off"];if(+p.stock<=5)return["Estoque baixo","off"];return["Disponível",""]}
 function render(){let q=$("search").value.toLowerCase().trim(),list=products.filter(p=>(p.name+" "+p.category).toLowerCase().includes(q));$("count").textContent=products.length;$("stockCount").textContent=products.reduce((n,p)=>n+(!p.unlimited?Number(p.stock||0):0),0);$("outCount").textContent=products.filter(p=>p.active&&!p.unlimited&&+p.stock<=0).length;$("rows").innerHTML=list.map(p=>{let [s,c]=status(p);return `<tr><td>${esc(p.icon||"📦")} <b>${esc(p.name)}</b></td><td>${esc(p.category)}</td><td>${money(p.price)}</td><td>${p.unlimited?"∞":Number(p.stock||0)}</td><td><span class="pill ${c}">${s}</span></td><td><div class="actions"><button class="secondary" data-edit="${esc(p.id)}">Editar</button><button class="danger" data-del="${esc(p.id)}">Excluir</button></div></td></tr>`}).join("")||'<tr><td colspan="6">Nenhum produto encontrado.</td></tr>';document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openForm(b.dataset.edit));document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>removeProduct(b.dataset.del))}
+async function seedDefaultProducts(){
+  const existingNames=new Set(products.map(p=>String(p.name||"").trim().toLowerCase()));
+  const missing=defaultProducts.filter(p=>!existingNames.has(p.name.toLowerCase()));
+  if(!missing.length){
+    $("listMsg").textContent="Todos os produtos padrão já estão cadastrados.";
+    return;
+  }
+  $("listMsg").textContent=`Cadastrando ${missing.length} produto(s)…`;
+  try{
+    for(let i=0;i<missing.length;i++){
+      const p=missing[i];
+      await addDoc(collection(db,"products"),{
+        name:p.name,category:p.category,icon:p.icon,price:null,stock:0,
+        order:i,unlimited:false,active:true,createdAt:serverTimestamp(),updatedAt:serverTimestamp()
+      });
+    }
+    await load();
+    $("listMsg").textContent=`${missing.length} produto(s) padrão cadastrado(s) com sucesso.`;
+  }catch(e){
+    $("listMsg").textContent="Erro ao cadastrar produtos: "+e.message;
+  }
+}
 async function load(){ $("listMsg").textContent="Sincronizando…";try{let snap=await getDocs(collection(db,"products"));products=snap.docs.map(d=>({id:d.id,...d.data()}));render();$("listMsg").textContent="Catálogo sincronizado com o Firestore."}catch(e){$("listMsg").textContent="Erro ao carregar: "+e.message}}
 function openForm(id=""){let p=products.find(x=>x.id===id);$("productForm").reset();$("docId").value=p?.id||"";$("modalTitle").textContent=p?"Editar produto":"Novo produto";$("pName").value=p?.name||"";$("pCategory").value=p?.category||"";$("pPrice").value=p?.price??"";$("pStock").value=p?.stock??0;$("pIcon").value=p?.icon||"";$("pOrder").value=p?.order??0;$("pUnlimited").checked=!!p?.unlimited;$("pActive").checked=p?.active!==false;$("deleteBtn").classList.toggle("hidden",!p);$("formMsg").textContent="";$("modal").classList.remove("hidden")}
 async function removeProduct(id){let p=products.find(x=>x.id===id);if(!p||!confirm(`Excluir ${p.name}?`))return;try{await deleteDoc(doc(db,"products",id));await load()}catch(e){alert("Erro ao excluir: "+e.message)}}
-$("newBtn").onclick=()=>openForm();$("closeModal").onclick=()=>$("modal").classList.add("hidden");$("search").oninput=render;$("deleteBtn").onclick=async()=>{let id=$("docId").value;if(id)await removeProduct(id);$("modal").classList.add("hidden")};
+$("newBtn").onclick=()=>openForm();$("seedBtn").onclick=seedDefaultProducts;$("closeModal").onclick=()=>$("modal").classList.add("hidden");$("search").oninput=render;$("deleteBtn").onclick=async()=>{let id=$("docId").value;if(id)await removeProduct(id);$("modal").classList.add("hidden")};
 $("productForm").onsubmit=async e=>{e.preventDefault();let id=$("docId").value,data={name:$("pName").value.trim(),category:$("pCategory").value.trim(),price:$("pPrice").value===""?null:Number($("pPrice").value),stock:$("pUnlimited").checked?0:Number($("pStock").value||0),icon:$("pIcon").value.trim()||"📦",order:Number($("pOrder").value||0),unlimited:$("pUnlimited").checked,active:$("pActive").checked,updatedAt:serverTimestamp()};$("formMsg").textContent="Salvando…";try{if(id)await updateDoc(doc(db,"products",id),data);else await addDoc(collection(db,"products"),{...data,createdAt:serverTimestamp()});$("modal").classList.add("hidden");await load()}catch(err){$("formMsg").textContent="Falha ao salvar: "+err.message}};
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginMsg").textContent="Entrando…";try{await signInWithEmailAndPassword(auth,$("email").value,$("password").value);$("loginMsg").textContent=""}catch(e){$("loginMsg").textContent="Login não realizado. Confira e-mail e senha."}};
 $("logout").onclick=()=>signOut(auth);onAuthStateChanged(auth,u=>{let ok=!!u;$("login").classList.toggle("hidden",ok);$("app").classList.toggle("hidden",!ok);$("logout").classList.toggle("hidden",!ok);if(ok)load()});
