@@ -21,6 +21,60 @@
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:100}.modal.show{display:flex}.modalBox{width:min(440px,92vw);background:#090714;border:1px solid #7428e6;border-radius:16px;padding:20px;box-shadow:0 0 50px rgba(124,43,255,.3)}.modalBox h2{margin-top:0}.close{float:right;background:none;border:0;color:#fff;font-size:22px}.cartLine{display:flex;justify-content:space-between;border-bottom:1px solid #251740;padding:10px 0}.empty{color:#aaa;text-align:center;padding:30px}
 @media(max-width:1150px){.products{grid-template-columns:repeat(4,1fr)}.categories{grid-template-columns:repeat(4,1fr)}.layout{grid-template-columns:1fr}.side{display:none}}
 @media(max-width:700px){.header{padding:0 14px;height:58px;gap:10px}.brand{font-size:21px;margin-right:4px}.crown{font-size:25px}.nav{gap:11px}.nav a{font-size:11px}.nav a:nth-child(3),.nav a:nth-child(4){display:none}.header-right{gap:5px}.searchTop{display:none}.wrap{padding:9px}.hero{height:420px}.heroText{left:20px;top:22px}.hero h1{font-size:54px}.hero p{font-size:17px}.benefits{flex-wrap:wrap}.categories{grid-template-columns:repeat(2,1fr)}.products{grid-template-columns:repeat(2,1fr)}.toolbar{flex-wrap:wrap}.searchBox{max-width:none;width:100%;margin-left:0}.footer{padding:15px;gap:10px;flex-direction:column}.support{align-items:flex-start;flex-direction:column}}
+
+/* CORREÇÃO DOS CONTROLES DE ESTOQUE/QUANTIDADE */
+.qtyRow{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex-wrap:wrap !important;
+  gap:5px !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  box-sizing:border-box !important;
+  margin:8px 0 10px !important;
+  overflow:hidden !important;
+}
+.qtyBtn{
+  width:28px !important;
+  height:30px !important;
+  min-width:28px !important;
+  max-width:28px !important;
+  padding:0 !important;
+  flex:0 0 28px !important;
+  box-sizing:border-box !important;
+  border:1px solid #7045c7 !important;
+  border-radius:7px !important;
+  background:#181126 !important;
+  color:#fff !important;
+  font-weight:900 !important;
+  line-height:28px !important;
+}
+.qtyValue{
+  min-width:20px !important;
+  width:20px !important;
+  max-width:24px !important;
+  text-align:center !important;
+  font-weight:800 !important;
+  flex:0 0 20px !important;
+  box-sizing:border-box !important;
+}
+.qtyRow .add{
+  flex:1 1 100% !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  height:30px !important;
+  box-sizing:border-box !important;
+  margin-top:1px !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+.product{
+  overflow:hidden;
+}
 </style>
 </head>
 <body>
