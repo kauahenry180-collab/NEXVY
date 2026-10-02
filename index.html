@@ -43,7 +43,19 @@
 <footer class="footer"><div class="footerBrand">♛ NEXVY</div><div>© 2026 NEXVY — Todos os direitos reservados.</div><div class="socials"><span>◎</span><span>♪</span><span>▶</span><span>𝕏</span><span>♧</span></div></footer>
 <div class="modal" id="modal"><div class="modalBox"><button class="close" onclick="closeModal()">×</button><div id="modalContent"></div></div></div>
 <script>
-let products=[];
+const defaultProducts=[
+['Discord Nitro 1 mês','Discord','💬','Consultar',0,true],['Discord Nitro 3 meses','Discord','💬','Consultar',0,true],
+['Spotify Premium 1 mês','Spotify','🎵','Consultar',0,true],['Spotify Premium 3 meses','Spotify','🎵','Consultar',0,true],['Spotify Premium Eterno','Spotify','♾','Consultar',0,true],
+['Netflix Premium 1 mês','Streaming','N','Consultar',0,true],['Disney+ Premium 1 mês','Streaming','◉','Consultar',0,true],['HBO Max Premium 1 mês','Streaming','HBO','Consultar',0,true],
+['ChatGPT Plus 1 mês','Produtividade','AI','Consultar',0,true],['Canva Pro','Design','C','Consultar',0,true],['CapCut Pro','Design','✂','Consultar',0,true],
+['Discord Boosts','Discord','🚀','Consultar',0,true],['Discord Members — 100 OFF','Discord','👥','Consultar',0,true],['Discord Members — 200 OFF','Discord','👥','Consultar',0,true],['Discord Members — 300 OFF','Discord','👥','Consultar',0,true],['Discord Members — 50 ON','Discord','👥','Consultar',0,true],['Discord Members — 50 Reações','Discord','❤️','Consultar',0,true],
+['Instagram — Seguidores','Social','◎','Consultar',0,true],['Instagram — Curtidas','Social','♥','Consultar',0,true],['Instagram — Visualizações','Social','◉','Consultar',0,true],
+['TikTok — Seguidores','Social','♪','Consultar',0,true],['TikTok — Curtidas','Social','♥','Consultar',0,true],['TikTok — Visualizações','Social','◉','Consultar',0,true],['TikTok — Reposts','Social','↻','Consultar',0,true],
+['YouTube — Seguidores','Social','▶','Consultar',0,true],['YouTube — Curtidas','Social','👍','Consultar',0,true],['YouTube — Visualizações','Social','▶','Consultar',0,true],
+['Facebook — Seguidores','Social','f','Consultar',0,true],['Telegram Members','Social','✈','Consultar',0,true],
+['Steam Keys','Games','🎮','Consultar',0,true],['Robux','Games','🪙','Consultar',0,true]
+];
+let products=defaultProducts;
 let cart=[];let active='Todos';
 const $=s=>document.querySelector(s);
 const money=n=>Number(n)>0?Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'Consultar';
