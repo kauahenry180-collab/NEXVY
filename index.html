@@ -53,7 +53,7 @@ function render(){
  .forEach(p=>{
   const d=document.createElement('div');d.className='product';
   const price=typeof p[3]==='number' ? p[3].toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : (p[3]||'Consultar');
-  const unavailable=!p.unlimited && Number(p.stock||0)<=0;
+  const unavailable=!p[5] && Number(p[4]||0)<=0;
   d.innerHTML=`<div class="pIcon"><span class="bigEmoji">${esc(p[2]||'📦')}</span></div><h3>${esc(p[0])}</h3><div class="meta">${esc(p[1])} • ${p[1]==='Social'?'Serviço':'Produto'}</div><div class="price">${esc(price)}</div><button class="add" ${unavailable?'disabled':''}>${unavailable?'ESGOTADO':'Adicionar'}</button>`;
   const btn=d.querySelector('.add');
   if(unavailable)btn.style.opacity='.5';
@@ -62,7 +62,18 @@ function render(){
  });
 }
 function filterCat(c){active=c;document.querySelector('#produtos').scrollIntoView({behavior:'smooth'});render()}
-function add(p){cart.push(p);$('#cartCount').textContent=cart.length;openCart()}
+function add(p){
+ const unlimited=p[5]===true;
+ const stock=Math.max(0,Number(p[4]||0));
+ const inCart=cart.filter(x=>x[0]===p[0]).length;
+ if(!unlimited && (stock<=0 || inCart>=stock)){toastStock();return}
+ cart.push(p);$('#cartCount').textContent=cart.length;openCart()
+}
+function toastStock(){
+ let el=document.querySelector('#stockToast');
+ if(!el){el=document.createElement('div');el.id='stockToast';el.style.cssText='position:fixed;right:20px;bottom:20px;z-index:9999;background:#120b20;border:1px solid #7b2cff;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 0 20px rgba(124,43,255,.3);font-weight:700';document.body.appendChild(el)}
+ el.textContent='Este produto está sem estoque ou atingiu o limite disponível.';el.style.display='block';clearTimeout(window._stockToastTimer);window._stockToastTimer=setTimeout(()=>el.style.display='none',2200)
+}
 function openCart(){openModal(`<h2>Seu carrinho</h2>${cart.length?cart.map((p,i)=>`<div class="cartLine"><span>${p[0]}</span><b>${p[3]}</b></div>`).join(''):'<div class="empty">Seu carrinho está vazio.</div>'}<button class="sideBtn" style="margin-top:15px" onclick="finish()">FINALIZAR PELO DISCORD</button>`)}
 function finish(){window.open('https://discord.gg/jXRWPKA7k','_blank')}
 function getAccounts(){try{return JSON.parse(localStorage.getItem('nexvy_accounts')||'[]')}catch(e){return[]}}
