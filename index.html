@@ -52,29 +52,63 @@ function render(){
  products.filter(p=>(active==='Todos'||String(p[1]||'').trim().toLocaleLowerCase('pt-BR')===String(active).trim().toLocaleLowerCase('pt-BR'))&&p[0].toLowerCase().includes(q))
  .forEach(p=>{
   const d=document.createElement('div');d.className='product';
-  const price=typeof p[3]==='number' ? p[3].toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : (p[3]||'Consultar');
-  const unavailable=!p[5] && Number(p[4]||0)<=0;
-  d.innerHTML=`<div class="pIcon"><span class="bigEmoji">${esc(p[2]||'📦')}</span></div><h3>${esc(p[0])}</h3><div class="meta">${esc(p[1])} • ${p[1]==='Social'?'Serviço':'Produto'}</div><div class="price">${esc(price)}</div><button class="add" ${unavailable?'disabled':''}>${unavailable?'ESGOTADO':'Adicionar'}</button>`;
+  const unitPrice=typeof p[3]==='number' ? p[3] : 0;
+  const price=unitPrice>0 ? unitPrice.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : (p[3]||'Consultar');
+  const unlimited=p[5]===true;
+  const stock=Math.max(0,Number(p[4]||0));
+  const unavailable=!unlimited && stock<=0;
+  const stockText=unlimited?'Estoque: ilimitado':`Estoque: ${stock} ${stock===1?'unidade':'unidades'}`;
+  d.innerHTML=`<div class="pIcon"><span class="bigEmoji">${esc(p[2]||'📦')}</span></div><h3>${esc(p[0])}</h3><div class="meta">${esc(p[1])} • ${p[1]==='Social'?'Serviço':'Produto'}</div><div class="price">${esc(price)}</div><div class="stockInfo" style="font-size:12px;color:${unavailable?'#ff6b7a':'#aaa'};margin:7px 0 10px;font-weight:700">${stockText}</div><div class="qtyRow" style="display:flex;align-items:center;gap:7px;margin-bottom:10px"><button class="qtyBtn" type="button" ${unavailable?'disabled':''}>−</button><span class="qtyValue" style="min-width:28px;text-align:center;font-weight:800">1</span><button class="qtyBtn" type="button" ${unavailable?'disabled':''}>+</button><button class="add" ${unavailable?'disabled':''}>${unavailable?'ESGOTADO':'Adicionar'}</button></div>`;
   const btn=d.querySelector('.add');
-  if(unavailable)btn.style.opacity='.5';
-  else btn.addEventListener('click',()=>add(p));
+  const minus=d.querySelector('.qtyBtn');
+  const plus=d.querySelectorAll('.qtyBtn')[1];
+  const qtyEl=d.querySelector('.qtyValue');
+  let qty=1;
+  const max=unlimited?Infinity:stock;
+  if(unavailable){btn.style.opacity='.5';if(minus)minus.disabled=true;if(plus)plus.disabled=true;}
+  else{
+    minus.addEventListener('click',()=>{qty=Math.max(1,qty-1);qtyEl.textContent=qty});
+    plus.addEventListener('click',()=>{qty=Math.min(max,qty+1);qtyEl.textContent=qty});
+    btn.addEventListener('click',()=>add(p,qty));
+  }
   box.appendChild(d);
  });
 }
 function filterCat(c){active=c;document.querySelector('#produtos').scrollIntoView({behavior:'smooth'});render()}
-function add(p){
+function add(p,qty=1){
  const unlimited=p[5]===true;
  const stock=Math.max(0,Number(p[4]||0));
- const inCart=cart.filter(x=>x[0]===p[0]).length;
- if(!unlimited && (stock<=0 || inCart>=stock)){toastStock();return}
- cart.push(p);$('#cartCount').textContent=cart.length;openCart()
+ const inCart=cart.filter(x=>x[0]===p[0]).reduce((s,x)=>s+(x.qty||1),0);
+ if(!unlimited && (stock<=0 || inCart+qty>stock)){toastStock();return}
+ const existing=cart.find(x=>x[0]===p[0]);
+ if(existing) existing.qty=(existing.qty||1)+qty;
+ else cart.push({...p,qty});
+ $('#cartCount').textContent=cart.reduce((s,x)=>s+(x.qty||1),0);
+ openCart();
 }
 function toastStock(){
  let el=document.querySelector('#stockToast');
  if(!el){el=document.createElement('div');el.id='stockToast';el.style.cssText='position:fixed;right:20px;bottom:20px;z-index:9999;background:#120b20;border:1px solid #7b2cff;color:#fff;padding:12px 16px;border-radius:10px;box-shadow:0 0 20px rgba(124,43,255,.3);font-weight:700';document.body.appendChild(el)}
- el.textContent='Este produto está sem estoque ou atingiu o limite disponível.';el.style.display='block';clearTimeout(window._stockToastTimer);window._stockToastTimer=setTimeout(()=>el.style.display='none',2200)
+ el.textContent='Quantidade indisponível para este produto.';el.style.display='block';clearTimeout(window._stockToastTimer);window._stockToastTimer=setTimeout(()=>el.style.display='none',2200);
 }
-function openCart(){openModal(`<h2>Seu carrinho</h2>${cart.length?cart.map((p,i)=>`<div class="cartLine"><span>${p[0]}</span><b>${p[3]}</b></div>`).join(''):'<div class="empty">Seu carrinho está vazio.</div>'}<button class="sideBtn" style="margin-top:15px" onclick="finish()">FINALIZAR PELO DISCORD</button>`)}
+function changeCartQty(name,delta){
+ const item=cart.find(x=>x[0]===name);if(!item)return;
+ const unlimited=item[5]===true;const stock=Math.max(0,Number(item[4]||0));
+ const next=(item.qty||1)+delta;
+ if(next<=0){cart=cart.filter(x=>x[0]!==name);openCart();return}
+ if(!unlimited && next>stock){toastStock();return}
+ item.qty=next;openCart();
+}
+function removeCartItem(name){cart=cart.filter(x=>x[0]!==name);openCart()}
+function openCart(){
+ const total=cart.reduce((sum,p)=>{const unit=typeof p[3]==='number'?p[3]:0;return sum+unit*(p.qty||1)},0);
+ const hasConsultar=cart.some(p=>typeof p[3]!=='number'||p[3]===0);
+ const totalText=hasConsultar?(total>0?money(total)+' + Consultar':'Consultar'):money(total);
+ openModal(`<h2>Seu carrinho</h2>${cart.length?cart.map(p=>{
+   const qty=p.qty||1;const unit=typeof p[3]==='number'?p[3]:0;const subtotal=unit*qty;
+   return `<div class="cartLine" style="display:block"><div style="display:flex;justify-content:space-between;gap:10px"><span>${esc(p[0])}</span><b>${unit>0?money(unit)+' / un.':'Consultar'}</b></div><div style="display:flex;align-items:center;justify-content:space-between;margin-top:9px;gap:8px"><div style="display:flex;align-items:center;gap:7px"><button class="qtyBtn" onclick="changeCartQty(${JSON.stringify(p[0])},-1)">−</button><strong>${qty}</strong><button class="qtyBtn" onclick="changeCartQty(${JSON.stringify(p[0])},1)">+</button></div><span style="font-weight:800">${subtotal>0?money(subtotal):'Consultar'}</span><button onclick="removeCartItem(${JSON.stringify(p[0])})" style="border:0;background:none;color:#ff7181;font-size:18px">×</button></div></div>`;
+ }).join(''):'<div class="empty">Seu carrinho está vazio.</div>'}<div style="margin-top:18px;padding:15px;border-radius:12px;background:#120b20;border:1px solid #6d29d9;display:flex;justify-content:space-between;align-items:center"><strong style="font-size:18px">TOTAL</strong><strong style="font-size:22px;color:#b06cff">${totalText}</strong></div><button class="sideBtn" style="margin-top:15px" onclick="finish()">FINALIZAR PELO DISCORD</button>`);
+}
 function finish(){window.open('https://discord.gg/jXRWPKA7k','_blank')}
 function getAccounts(){try{return JSON.parse(localStorage.getItem('nexvy_accounts')||'[]')}catch(e){return[]}}
 function saveAccounts(a){localStorage.setItem('nexvy_accounts',JSON.stringify(a))}
